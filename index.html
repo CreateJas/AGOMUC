@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Effect with Vue.js</title>
+    <title>Matrix Effect with Vue.js and Parallax</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+
         body {
             background-color: black;
             margin: 0;
@@ -34,26 +36,23 @@
             position: relative;
             z-index: 2;
             margin: 50px auto 0;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto;
             align-items: center;
+            gap: 20px;
         }
-        .company-name {
+        .heading {
+            grid-column: span 2;
+            font-family: 'Space Mono', monospace;
             font-size: 5vw;
             color: #00ff00;
             text-shadow: 0 0 5px lime;
             margin-bottom: 20px;
-            overflow: hidden;
             white-space: nowrap;
         }
-        .typing-animation {
-            animation: typing 4s steps(12, end);
-            animation-fill-mode: forwards;
-        }
-        @keyframes typing {
-            0% { width: 0; }
-            100% { width: 100%; }
-        }
         .description-box {
+            display: flex;
+            flex-direction: column;
             background-color: rgba(0, 0, 0, 0.5);
             padding: 20px;
             border-radius: 10px;
@@ -61,9 +60,10 @@
             font-size: 1.5vw;
             line-height: 1.8;
             text-align: left;
-            position: relative;
-            z-index: 2;
-            flex: 1;
+        }
+        .description-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2em;
         }
         .description-line { margin-bottom: 15px; }
         .animation-box {
@@ -83,12 +83,12 @@
             height: 100%;
             filter: blur(5px);
             z-index: -1;
+            background-attachment: fixed; /* Parallax effect */
         }
         .cube-container {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             perspective: 500px;
-            margin-left: 20px;
             position: relative;
             z-index: 2;
             cursor: pointer;
@@ -109,12 +109,12 @@
             backface-visibility: hidden;
             transition: background-color 0.3s ease;
         }
-        .cube-face:nth-child(1) { transform: translateZ(50px); }
-        .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(50px); }
-        .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(50px); }
-        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(50px); }
-        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(50px); }
-        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(50px); }
+        .cube-face:nth-child(1) { transform: translateZ(40px); }
+        .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(40px); }
+        .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(40px); }
+        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
+        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
+        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
         @keyframes rotateCube {
             0% { transform: rotateX(0) rotateY(0); }
             100% { transform: rotateX(360deg) rotateY(360deg); }
@@ -164,19 +164,23 @@
         }
         .navbar a:hover { color: #00ff00; }
         @media screen and (max-width: 768px) {
-            .company-name { font-size: 7vw; }
-            .description-box { font-size: 3.5vw; }
+            .heading {
+                font-size: 7vw;
+            }
+            .description-box {
+                font-size: 3.5vw;
+            }
             .cube-container {
-                width: 80px;
-                height: 80px;
+                width: 60px;
+                height: 60px;
                 perspective: 400px;
             }
-            .cube-face:nth-child(1) { transform: translateZ(40px); }
-            .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(40px); }
-            .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(40px); }
-            .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
-            .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
-            .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
+            .cube-face:nth-child(1) { transform: translateZ(30px); }
+            .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(30px); }
+            .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(30px); }
+            .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(30px); }
+            .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(30px); }
+            .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(30px); }
         }
     </style>
 </head>
@@ -184,10 +188,11 @@
     <div id="app">
         <navbar-component></navbar-component>
         <div class="content">
+            <div class="heading typing-animation">AGOMUC PROGRAM</div>
             <div class="description-box">
-                <div class="description-line">At A we are redefining crime prevention in India by leveraging advanced machine learning and artificial intelligence.</div>
-                <div class="description-line">Our mission is to create safer communities through a proactive approach to crime detection and prevention.</div>
-                <div class="description-line">Our application serves as a comprehensive tool for individuals and law enforcement agencies, providing detailed analytics, predictive insights, and real-time safety features.</div>
+                <div class="description-text">
+                    At AGOMUC, we leverage advanced AI and ML to transform crime prevention, providing real-time analytics and safety features to enhance community security.
+                </div>
             </div>
             <cube-component></cube-component>
         </div>
@@ -196,6 +201,7 @@
             <div class="falling-numbers-container"></div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script>
         Vue.component('navbar-component', {
@@ -213,7 +219,7 @@
 
         Vue.component('cube-component', {
             template: `
-                <div class="cube-container" @click="toggleCubeColor">
+                <div class="cube-container" @click="navigateToPage2">
                     <div class="cube">
                         <div class="cube-face" v-for="n in 6"></div>
                     </div>
@@ -225,12 +231,11 @@
                 };
             },
             methods: {
-                toggleCubeColor() {
-                    this.isBlue = !this.isBlue;
-                    const cubeFaces = this.$el.querySelectorAll('.cube-face');
-                    cubeFaces.forEach(face => {
-                        face.style.backgroundColor = this.isBlue ? '#0000FF' : 'rgba(0, 255, 0, 0.3)';
-                    });
+                navigateToPage2() {
+                    document.querySelector('#app').style.opacity = '0';
+                    setTimeout(() => {
+                        window.location.href = 'matrix.html';
+                    }, 1000);  // Wait for the fade-out to complete
                 }
             }
         });
