@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Cube with Animation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: rgba(25, 25, 25, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+        #blackhole {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="blackhole">
+        <canvas id="animationCanvas"></canvas>
+    </div>
+
+    <script>
+        let expanse = true;
+
+        function initializeBlackHole() {
+            const canvas = document.getElementById('animationCanvas');
+            const context = canvas.getContext('2d');
+            const width = canvas.width = window.innerWidth;
+            const height = canvas.height = window.innerHeight;
+            const centerx = width / 2;
+            const centery = height / 2;
+            const maxorbit = 255;
+            const numbers = '0123456789ABCDEF';
+            let stars = [];
+            let startTime = new Date().getTime();
+            let currentTime = 0;
+
+            function setDPI(canvas, dpi) {
+                const scaleFactor = dpi / 96;
+                canvas.width = Math.ceil(canvas.width * scaleFactor);
+                canvas.height = Math.ceil(canvas.height * scaleFactor);
+                const ctx = canvas.getContext('2d');
+                ctx.scale(scaleFactor, scaleFactor);
+            }
+
+            function rotate(cx, cy, x, y, angle) {
+                const radians = angle;
+                const cos = Math.cos(radians);
+                const sin = Math.sin(radians);
+                const nx = (cos * (x - cx)) + (sin * (y - cy)) + cx;
+                const ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+                return [nx, ny];
+            }
+
+            setDPI(canvas, 192);
+
+            class Star {
+                constructor() {
+                    const rands = [Math.random() * (maxorbit / 2) + 1, Math.random() * (maxorbit / 2) + maxorbit];
+                    this.orbital = rands.reduce((p, c) => p + c, 0) / rands.length;
+                    this.x = centerx;
+                    this.y = centery + this.orbital;
+                    this.yOrigin = centery + this.orbital;
+                    this.speed = (Math.floor(Math.random() * 2.5) + 1.5) * Math.PI / 180;
+                    this.rotation = 0;
+                    this.startRotation = (Math.floor(Math.random() * 360) + 1) * Math.PI / 180;
+                    this.id = stars.length;
+                    this.collapseBonus = this.orbital - (maxorbit * 0.7);
+                    this.collapseBonus = Math.max(this.collapseBonus, 0);
+                    this.color = Math.random() > 0.5 ? 'rgba(0,255,0,' + (1 - (this.orbital / 255)) + ')' : 'rgba(0,0,255,' + (1 - (this.orbital / 255)) + ')';
+                    this.hoverPos = centery + (maxorbit / 2) + this.collapseBonus;
+                    this.expansePos = centery + (this.id % 100) * -10 + (Math.floor(Math.random() * 20) + 1);
+                    this.prevR = this.startRotation;
+                    this.prevX = this.x;
+                    this.prevY = this.y;
+                    this.number = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                    stars.push(this);
+                }
+
+                draw() {
+                    if (!expanse) {
+                        this.rotation = this.startRotation + (currentTime * this.speed);
+                        if (this.y > this.yOrigin) {
+                            this.y -= 1.5; // Adjusted speed for smoother animation
+                        }
+                        if (this.y < this.yOrigin - 4) {
+                            this.y += (this.yOrigin - this.y) / 10;
+                        }
+                    } else {
+                        this.rotation = this.startRotation + (currentTime * (this.speed / 4)); // Adjusted speed for smoother animation
+                        if (this.y > this.expansePos) {
+                            this.y -= Math.floor(this.expansePos - this.y) / -140;
+                        }
+                    }
+
+                    context.save();
+                    context.fillStyle = this.color;
+                    context.font = '8px Space Mono';
+                    context.translate(centerx, centery);
+                    context.rotate(this.rotation);
+                    context.translate(-centerx, -centery);
+                    context.fillText(this.number, this.x, this.y);
+                    context.restore();
+
+                    this.prevR = this.rotation;
+                    this.prevX = this.x;
+                    this.prevY = this.y;
+                }
+            }
+
+            function loop() {
+                const now = new Date().getTime();
+                currentTime = (now - startTime) / 50;
+
+                context.fillStyle = 'rgba(25,25,25,0.5)'; // Updated to better clear previous frame
+                context.fillRect(0, 0, width, height);
+
+                for (let i = 0; i < stars.length; i++) {
+                    stars[i].draw();
+                }
+
+                requestAnimationFrame(loop);
+            }
+
+            function init() {
+                context.fillStyle = 'rgba(25,25,25,1)';
+                context.fillRect(0, 0, width, height);
+                for (let i = 0; i < 1000; i++) { // Increased number of stars
+                    new Star();
+                }
+                loop();
+            }
+
+            init();
+        }
+
+        initializeBlackHole();
+    </script>
+</body>
+</html>
