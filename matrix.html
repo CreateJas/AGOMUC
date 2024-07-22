@@ -10,7 +10,7 @@
         html, body {
             height: 100%;
             margin: 0;
-            background-color: rgba(25, 25, 25, 1);
+            background-color: rgba(10, 10, 10, 1); /* Darker background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,11 +35,31 @@
             width: 100%;
             height: 100%;
         }
+        .content {
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.5); /* Transparent box */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .content h1 {
+            font-size: 2em;
+            margin: 0 0 10px;
+        }
+        .content p {
+            font-size: 1em;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
     <div id="blackhole">
         <canvas id="animationCanvas"></canvas>
+        <div class="content">
+            <h1>Welcome to the Rotating Cube Animation</h1>
+            <p>Experience the mesmerizing movement of stars in a dynamic, rotating cube.</p>
+        </div>
     </div>
 
     <script>
@@ -48,15 +68,18 @@
         function initializeBlackHole() {
             const canvas = document.getElementById('animationCanvas');
             const context = canvas.getContext('2d');
-            const width = canvas.width = window.innerWidth;
-            const height = canvas.height = window.innerHeight;
-            const centerx = width / 2;
-            const centery = height / 2;
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
             const maxorbit = 255;
             const numbers = '0123456789ABCDEF';
             let stars = [];
             let startTime = new Date().getTime();
             let currentTime = 0;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
 
             function setDPI(canvas, dpi) {
                 const scaleFactor = dpi / 96;
@@ -81,18 +104,18 @@
                 constructor() {
                     const rands = [Math.random() * (maxorbit / 2) + 1, Math.random() * (maxorbit / 2) + maxorbit];
                     this.orbital = rands.reduce((p, c) => p + c, 0) / rands.length;
-                    this.x = centerx;
-                    this.y = centery + this.orbital;
-                    this.yOrigin = centery + this.orbital;
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height / 2 + this.orbital;
+                    this.yOrigin = canvas.height / 2 + this.orbital;
                     this.speed = (Math.floor(Math.random() * 2.5) + 1.5) * Math.PI / 180;
                     this.rotation = 0;
                     this.startRotation = (Math.floor(Math.random() * 360) + 1) * Math.PI / 180;
                     this.id = stars.length;
                     this.collapseBonus = this.orbital - (maxorbit * 0.7);
                     this.collapseBonus = Math.max(this.collapseBonus, 0);
-                    this.color = Math.random() > 0.5 ? 'rgba(0,255,0,' + (1 - (this.orbital / 255)) + ')' : 'rgba(0,0,255,' + (1 - (this.orbital / 255)) + ')';
-                    this.hoverPos = centery + (maxorbit / 2) + this.collapseBonus;
-                    this.expansePos = centery + (this.id % 100) * -10 + (Math.floor(Math.random() * 20) + 1);
+                    this.color = Math.random() > 0.5 ? 'rgba(0,255,0,' + (1 - (this.orbital / 255) + 0.5) + ')' : 'rgba(0,0,255,' + (1 - (this.orbital / 255) + 0.5) + ')'; // Brighter colors
+                    this.hoverPos = canvas.height / 2 + (maxorbit / 2) + this.collapseBonus;
+                    this.expansePos = canvas.height / 2 + (this.id % 100) * -10 + (Math.floor(Math.random() * 20) + 1);
                     this.prevR = this.startRotation;
                     this.prevX = this.x;
                     this.prevY = this.y;
@@ -119,9 +142,9 @@
                     context.save();
                     context.fillStyle = this.color;
                     context.font = '8px Space Mono';
-                    context.translate(centerx, centery);
+                    context.translate(canvas.width / 2, canvas.height / 2);
                     context.rotate(this.rotation);
-                    context.translate(-centerx, -centery);
+                    context.translate(-canvas.width / 2, -canvas.height / 2);
                     context.fillText(this.number, this.x, this.y);
                     context.restore();
 
@@ -135,8 +158,8 @@
                 const now = new Date().getTime();
                 currentTime = (now - startTime) / 50;
 
-                context.fillStyle = 'rgba(25,25,25,0.5)'; // Updated to better clear previous frame
-                context.fillRect(0, 0, width, height);
+                context.fillStyle = 'rgba(10,10,10,0.5)'; // Darker background for higher contrast
+                context.fillRect(0, 0, canvas.width, canvas.height);
 
                 for (let i = 0; i < stars.length; i++) {
                     stars[i].draw();
@@ -146,9 +169,9 @@
             }
 
             function init() {
-                context.fillStyle = 'rgba(25,25,25,1)';
-                context.fillRect(0, 0, width, height);
-                for (let i = 0; i < 1000; i++) { // Increased number of stars
+                context.fillStyle = 'rgba(10,10,10,1)';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < 500; i++) { // Reduced number of stars
                     new Star();
                 }
                 loop();
