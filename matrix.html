@@ -42,6 +42,7 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            cursor: pointer; /* Indicate that this is clickable */
         }
         .content h1 {
             font-size: 2em;
@@ -56,9 +57,9 @@
 <body>
     <div id="blackhole">
         <canvas id="animationCanvas"></canvas>
-        <div class="content">
-            <h1>Welcome to the Rotating Cube Animation</h1>
-            <p>Experience the mesmerizing movement of stars in a dynamic, rotating cube.</p>
+        <div class="content" id="content">
+            <h1>Why Choose Us?</h1>
+            <p>Discover the unique blend of innovation and excellence we bring to every project. Experience the future of technology with our dynamic, rotating cube animation.</p>
         </div>
     </div>
 
@@ -179,6 +180,12 @@
 
             init();
         }
+
+        function toggleAnimation() {
+            expanse = !expanse;
+        }
+
+        document.getElementById('content').addEventListener('click', toggleAnimation);
 
         initializeBlackHole();
     </script>
