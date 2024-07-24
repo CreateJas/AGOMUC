@@ -13,7 +13,6 @@
             height: 100%;
             margin: 0;
             background-color: rgba(10, 10, 10, 1);
-            /* Darker background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -45,12 +44,10 @@
             position: relative;
             z-index: 2;
             background: rgba(0, 0, 0, 0.5);
-            /* Transparent box */
             padding: 20px;
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
-            /* Indicate that this is clickable */
         }
 
         .content h1 {
@@ -68,11 +65,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            /* Start small */
-            transition: transform 5s ease-out, opacity 5s ease-out;
-            /* Extended smooth transition */
+            transition: transform 10s ease-out, opacity 10s ease-out;
             opacity: 0;
-            /* Start fully transparent */
             z-index: 1;
         }
 
@@ -183,7 +177,7 @@
                     this.id = stars.length;
                     this.collapseBonus = this.orbital - (maxorbit * 0.7);
                     this.collapseBonus = Math.max(this.collapseBonus, 0);
-                    this.color = Math.random() > 0.5 ? 'rgba(0,255,0,' + (1 - (this.orbital / 255) + 0.5) + ')' : 'rgba(0,0,255,' + (1 - (this.orbital / 255) + 0.5) + ')'; // Brighter colors
+                    this.color = Math.random() > 0.5 ? 'rgba(0,255,0,' + (1 - (this.orbital / 255) + 0.5) + ')' : 'rgba(0,0,255,' + (1 - (this.orbital / 255) + 0.5) + ')';
                     this.hoverPos = canvas.height / 2 + (maxorbit / 2) + this.collapseBonus;
                     this.expansePos = canvas.height / 2 + (this.id % 100) * -10 + (Math.floor(Math.random() * 20) + 1);
                     this.prevR = this.startRotation;
@@ -197,13 +191,13 @@
                     if (!expanse) {
                         this.rotation = this.startRotation + (currentTime * this.speed);
                         if (this.y > this.yOrigin) {
-                            this.y -= 1.5; // Adjusted speed for smoother animation
+                            this.y -= 1.5;
                         }
                         if (this.y < this.yOrigin - 4) {
                             this.y += (this.yOrigin - this.y) / 10;
                         }
                     } else {
-                        this.rotation = this.startRotation + (currentTime * (this.speed / 4)); // Adjusted speed for smoother animation
+                        this.rotation = this.startRotation + (currentTime * (this.speed / 4));
                         if (this.y > this.expansePos) {
                             this.y -= Math.floor(this.expansePos - this.y) / -140;
                         }
@@ -228,7 +222,7 @@
                 const now = new Date().getTime();
                 currentTime = (now - startTime) / 50;
 
-                context.fillStyle = 'rgba(10,10,10,0.5)'; // Darker background for higher contrast
+                context.fillStyle = 'rgba(10,10,10,0.5)';
                 context.fillRect(0, 0, canvas.width, canvas.height);
 
                 for (let i = 0; i < stars.length; i++) {
@@ -241,7 +235,7 @@
             function init() {
                 context.fillStyle = 'rgba(10,10,10,1)';
                 context.fillRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < 500; i++) { // Reduced number of stars
+                for (let i = 0; i < 100; i++) {
                     new Star();
                 }
                 loop();
@@ -252,37 +246,17 @@
 
         function emergeImages() {
             const images = document.querySelectorAll('.imageWrapper');
-            const maxRadius = Math.max(window.innerWidth, window.innerHeight); // Use the larger of the two to ensure full coverage
+            const maxRadius = Math.max(window.innerWidth, window.innerHeight);
             images.forEach((imageWrapper, index) => {
-                const angle = Math.random() * 360; // Random angle for each image
-                const radius = Math.random() * maxRadius / 2; // Random radius up to half of the maximum
-                const randomX = radius * Math.cos(angle * Math.PI / 180); // Calculate the x offset
-                const randomY = radius * Math.sin(angle * Math.PI / 180); // Calculate the y offset
+                const angle = Math.random() * 360;
+                const radius = Math.random() * maxRadius / 2;
+                const randomX = radius * Math.cos(angle * Math.PI / 180);
+                const randomY = radius * Math.sin(angle * Math.PI / 180);
                 imageWrapper.style.setProperty('--random-x', `${randomX}px`);
                 imageWrapper.style.setProperty('--random-y', `${randomY}px`);
-                imageWrapper.style.animation = `emergeAndFloat 8s ${index * 0.5}s forwards`; // Apply animation with staggered start times
+                imageWrapper.style.animation = `emergeAndFloat 15s ${index * 1}s forwards`;
             });
         }
-
-        document.getElementById('content').addEventListener('click', function () {
-            emergeImages();
-        });
-
-        initializeBlackHole();
-
-        document.getElementById('content').addEventListener('click', function () {
-            emergeImages();
-        });
-
-        initializeBlackHole();
-
-
-        document.getElementById('content').addEventListener('click', function () {
-            emergeImages();
-        });
-
-        initializeBlackHole();
-
 
         document.getElementById('content').addEventListener('click', function () {
             emergeImages();
