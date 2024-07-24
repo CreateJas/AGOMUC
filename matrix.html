@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
 
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
-            background-color: rgba(10, 10, 10, 1); /* Darker background */
+            background-color: rgba(10, 10, 10, 1);
+            /* Darker background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,6 +21,7 @@
             font-family: 'Courier New', monospace;
             color: #fff;
         }
+
         #blackhole {
             height: 100%;
             width: 100%;
@@ -28,6 +32,7 @@
             justify-content: center;
             align-items: center;
         }
+
         canvas {
             position: absolute;
             top: 0;
@@ -35,31 +40,95 @@
             width: 100%;
             height: 100%;
         }
+
         .content {
             position: relative;
-            z-index: 1;
-            background: rgba(0, 0, 0, 0.5); /* Transparent box */
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.5);
+            /* Transparent box */
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            cursor: pointer; /* Indicate that this is clickable */
+            cursor: pointer;
+            /* Indicate that this is clickable */
         }
+
         .content h1 {
             font-size: 2em;
             margin: 0 0 10px;
         }
+
         .content p {
             font-size: 1em;
             margin: 0;
         }
+
+        .imageWrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            /* Start small */
+            transition: transform 5s ease-out, opacity 5s ease-out;
+            /* Extended smooth transition */
+            opacity: 0;
+            /* Start fully transparent */
+            z-index: 1;
+        }
+
+        @keyframes emergeAndFloat {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(calc(-50% + var(--random-x)), calc(-50% + var(--random-y))) scale(1);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div id="blackhole">
         <canvas id="animationCanvas"></canvas>
         <div class="content" id="content">
             <h1>Why Choose Us?</h1>
-            <p>Discover the unique blend of innovation and excellence we bring to every project. Experience the future of technology with our dynamic, rotating cube animation.</p>
+            <p>Discover the unique blend of innovation and excellence we bring to every project. Experience the future
+                of technology with our dynamic, rotating cube animation.</p>
+        </div>
+        <div class="imageWrapper" id="imageWrapper1">
+            <img src="https://images.unsplash.com/photo-1606323544089-4ee380240779?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 1">
+        </div>
+        <div class="imageWrapper" id="imageWrapper2">
+            <img src="https://images.unsplash.com/photo-1606323516801-54354ac53b16?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 2">
+        </div>
+        <div class="imageWrapper" id="imageWrapper3">
+            <img src="https://images.unsplash.com/photo-1606323518643-12c25fca5c95?q=80&w=1064&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 3">
+        </div>
+        <div class="imageWrapper" id="imageWrapper4">
+            <img src="https://images.unsplash.com/photo-1606323518213-ba20fcddec0d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 4">
+        </div>
+        <div class="imageWrapper" id="imageWrapper5">
+            <img src="https://images.unsplash.com/photo-1606323543591-6d98e249e58d?q=80&w=1064&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 5">
+        </div>
+        <div class="imageWrapper" id="imageWrapper6">
+            <img src="https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 6">
+        </div>
+        <div class="imageWrapper" id="imageWrapper7">
+            <img src="https://images.unsplash.com/photo-1532077795300-c4b487f601f6?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Emerging Image 7">
         </div>
     </div>
 
@@ -181,13 +250,46 @@
             init();
         }
 
-        function toggleAnimation() {
-            expanse = !expanse;
+        function emergeImages() {
+            const images = document.querySelectorAll('.imageWrapper');
+            const maxRadius = Math.max(window.innerWidth, window.innerHeight); // Use the larger of the two to ensure full coverage
+            images.forEach((imageWrapper, index) => {
+                const angle = Math.random() * 360; // Random angle for each image
+                const radius = Math.random() * maxRadius / 2; // Random radius up to half of the maximum
+                const randomX = radius * Math.cos(angle * Math.PI / 180); // Calculate the x offset
+                const randomY = radius * Math.sin(angle * Math.PI / 180); // Calculate the y offset
+                imageWrapper.style.setProperty('--random-x', `${randomX}px`);
+                imageWrapper.style.setProperty('--random-y', `${randomY}px`);
+                imageWrapper.style.animation = `emergeAndFloat 8s ${index * 0.5}s forwards`; // Apply animation with staggered start times
+            });
         }
 
-        document.getElementById('content').addEventListener('click', toggleAnimation);
+        document.getElementById('content').addEventListener('click', function () {
+            emergeImages();
+        });
+
+        initializeBlackHole();
+
+        document.getElementById('content').addEventListener('click', function () {
+            emergeImages();
+        });
+
+        initializeBlackHole();
+
+
+        document.getElementById('content').addEventListener('click', function () {
+            emergeImages();
+        });
+
+        initializeBlackHole();
+
+
+        document.getElementById('content').addEventListener('click', function () {
+            emergeImages();
+        });
 
         initializeBlackHole();
     </script>
 </body>
+
 </html>
