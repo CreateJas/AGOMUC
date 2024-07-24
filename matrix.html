@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rotating Cube with Animation</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap');
 
         html,
         body {
@@ -18,7 +17,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            font-family: 'Courier New', monospace;
+            font-family: 'Orbitron', sans-serif;
             color: #fff;
         }
 
@@ -44,21 +43,40 @@
         .content {
             position: relative;
             z-index: 2;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            max-width: 800px;
         }
 
         .content h1 {
-            font-size: 2em;
-            margin: 0 0 10px;
+            font-size: 3em;
+            margin: 0 0 20px;
+            animation: blink 4s infinite;
+            color: #0f0;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50%,
+            100% {
+                opacity: 1;
+            }
+
+            25%,
+            75% {
+                opacity: 0;
+            }
         }
 
         .content p {
-            font-size: 1em;
+            font-size: 1.2em;
             margin: 0;
+            line-height: 1.5;
         }
 
         .imageWrapper {
@@ -87,81 +105,68 @@
             }
         }
 
-        .navbar {
+        .datetime {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            top: 10px;
+            left: 10px;
+            font-size: 1.5em;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
             z-index: 100;
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-family: 'Orbitron', sans-serif;
+            /* Add this line to change the font */
+        }
+
+
+        nav {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-family: 'Orbitron', sans-serif;
             font-size: 1.2em;
-        }
-
-        .navbar ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-
-        .navbar li {
-            margin: 0 15px;
-        }
-
-        .navbar a {
-            text-decoration: none;
             color: #fff;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li {
+            margin: 0;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
             transition: color 0.3s ease;
-            position: relative;
         }
 
-        .navbar a::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: #00ff00;
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-            transform-origin: bottom right;
-        }
-
-        .navbar a:hover::before {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
-
-        .navbar a:hover {
+        nav ul li a:hover {
             color: #00ff00;
         }
-
     </style>
 </head>
 
 <body>
-    <div class="navbar">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Contact</a></li>
-            
-        </ul>
-    </div>
-
     <div id="blackhole">
         <canvas id="animationCanvas"></canvas>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
         <div class="content" id="content">
-            <h1>Why Choose Us?</h1>
-            <p>Discover the unique blend of innovation and excellence we bring to every project. Experience the future
-                of technology with our dynamic, rotating cube animation.</p>
+            <h1>Why Are We?</h1>
+            <p>Discover how we leverage advanced AI and ML to transform public safety, providing real-time analytics and
+                innovative features that enhance community security.</p>
         </div>
         <div class="imageWrapper" id="imageWrapper1">
             <img src="https://images.unsplash.com/photo-1606323544089-4ee380240779?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -191,6 +196,7 @@
             <img src="https://images.unsplash.com/photo-1532077795300-c4b487f601f6?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Emerging Image 7">
         </div>
+        <div class="datetime" id="datetime"></div>
     </div>
 
     <script>
@@ -272,7 +278,7 @@
 
                     context.save();
                     context.fillStyle = this.color;
-                    context.font = '8px Orbitron';
+                    context.font = '8px Space Mono';
                     context.translate(canvas.width / 2, canvas.height / 2);
                     context.rotate(this.rotation);
                     context.translate(-canvas.width / 2, -canvas.height / 2);
@@ -328,6 +334,24 @@
         document.getElementById('content').addEventListener('click', function () {
             emergeImages();
         });
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            const formattedDate = now.toLocaleDateString('en-GB', options);
+            document.getElementById('datetime').innerText = formattedDate;
+        }
+
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
 
         initializeBlackHole();
     </script>
