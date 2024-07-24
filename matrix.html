@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rotating Cube with Animation</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
         html,
         body {
@@ -42,7 +42,7 @@
 
         .content {
             position: relative;
-            z-index: 2;
+            z-index: 10;
             background: rgba(0, 0, 0, 0.7);
             padding: 40px;
             border-radius: 10px;
@@ -60,7 +60,6 @@
         }
 
         @keyframes blink {
-
             0%,
             50%,
             100% {
@@ -86,7 +85,7 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 10s ease-out, opacity 10s ease-out;
             opacity: 0;
-            z-index: 1;
+            z-index: 5;
         }
 
         @keyframes emergeAndFloat {
@@ -114,9 +113,7 @@
             text-shadow: 0 0 10px #0f0;
             z-index: 100;
             font-family: 'Orbitron', sans-serif;
-            /* Add this line to change the font */
         }
-
 
         nav {
             position: fixed;
@@ -125,7 +122,7 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2em;
             color: #fff;
-            z-index: 100;
+            z-index: 1000;
         }
 
         nav ul {
@@ -149,13 +146,55 @@
         nav ul li a:hover {
             color: #00ff00;
         }
+
+        @media screen and (max-width: 800px) {
+            .content {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            .content h1 {
+                font-size: 2em;
+            }
+
+            .content p {
+                font-size: 1em;
+            }
+
+            .datetime {
+                font-size: 1em;
+                top: 5px;
+                left: 5px;
+            }
+
+            nav {
+                font-size: 1em;
+                top: 5px;
+                right: 5px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            .datetime {
+                font-size: 0.8em;
+            }
+
+            nav {
+                font-size: 0.8em;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div id="blackhole">
         <canvas id="animationCanvas"></canvas>
-        <nav>
+        <nav id="navbar">
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="#">About</a></li>
@@ -201,6 +240,7 @@
 
     <script>
         let expanse = true;
+        let navInitialPosition = {};
 
         function initializeBlackHole() {
             const canvas = document.getElementById('animationCanvas');
@@ -328,7 +368,21 @@
                 imageWrapper.style.setProperty('--random-x', `${randomX}px`);
                 imageWrapper.style.setProperty('--random-y', `${randomY}px`);
                 imageWrapper.style.animation = `emergeAndFloat 15s ${index * 1}s forwards`;
+                imageWrapper.style.zIndex = '1';
             });
+
+            const nav = document.getElementById('navbar');
+            const navRect = nav.getBoundingClientRect();
+            navInitialPosition = { top: navRect.top + window.scrollY, right: window.innerWidth - navRect.right };
+            nav.style.position = 'absolute';
+            nav.style.top = `${navInitialPosition.top}px`;
+            nav.style.right = `${navInitialPosition.right}px`;
+
+            setTimeout(() => {
+                nav.style.position = 'fixed';
+                nav.style.top = '10px';
+                nav.style.right = '10px';
+            }, 15000); // Adjust this duration to match the animation
         }
 
         document.getElementById('content').addEventListener('click', function () {
@@ -355,6 +409,10 @@
 
         initializeBlackHole();
     </script>
+</body>
+
+</html>
+
 </body>
 
 </html>
