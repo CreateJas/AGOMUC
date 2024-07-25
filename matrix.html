@@ -60,6 +60,7 @@
         }
 
         @keyframes blink {
+
             0%,
             50%,
             100% {
@@ -238,6 +239,7 @@
         <div class="datetime" id="datetime"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/three@0.125.2/build/three.min.js"></script>
     <script>
         let expanse = true;
         let navInitialPosition = {};
@@ -408,12 +410,196 @@
         updateDateTime();
 
         initializeBlackHole();
+
+        // Three.js Alien Dispersal Code
+        let scene, camera, renderer, alienHead;
+        const eyes = [];  // Array to store eye meshes
+        const eyeColors = [0xff0000, 0xff0000, 0xff0000, 0x0000ff, 0x0000ff]; // three red, two blue
+        let clock, deltaTime, particles, particleSystem;
+        let alienDispersed = false;
+        const particleCount = 1000;
+        const particleLifetimes = [];
+        let dispersalTime = 3.5; // Time in seconds for particles to vanish
+
+        function initAlien() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            clock = new THREE.Clock();
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(0, 20, 20);
+            scene.add(directionalLight);
+
+            // Alien head
+            const headMaterial = new THREE.MeshPhongMaterial({ color: 0x555555, specular: 0x111111 });
+            const headGeometry = new THREE.SphereGeometry(1, 32, 32); // smaller head
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            scene.add(head);
+
+            // Tentacles with claws
+            alienHead = new THREE.Group();
+            for (let i = 0; i < 12; i++) {
+                const tentacle = createTentacleWithClaws();
+                tentacle.rotation.z = (Math.PI / 6) * i;
+                alienHead.add(tentacle);
+            }
+
+            // Adding blinking eyes
+            for (let i = 0; i < 5; i++) {
+                const eyeGeometry = new THREE.SphereGeometry(0.1, 16, 16); // smaller eyes
+                const eyeMaterial = new THREE.MeshBasicMaterial({ color: eyeColors[i] });
+                const eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+                eye.position.set(0.6 * Math.cos(i * 2 * Math.PI / 5), 0.6 * Math.sin(i * 2 * Math.PI / 5), 0.8);
+                eyes.push(eye);
+                head.add(eye);
+            }
+
+            alienHead.add(head);
+            scene.add(alienHead);
+            alienHead.position.set(-5, -5, 0);
+            alienHead.scale.set(0.7, 0.7, 0.7); // Adjust this line to make the alien head bigger
+
+
+            // Particle system setup
+            particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const lifetimes = new Float32Array(particleCount);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = Math.random() * 2 - 1;
+                positions[i * 3 + 1] = Math.random() * 2 - 1;
+                positions[i * 3 + 2] = Math.random() * 2 - 1;
+                particleLifetimes.push(Math.random() * dispersalTime);
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('lifetime', new THREE.BufferAttribute(lifetimes, 1));
+            const pMaterial = new THREE.PointsMaterial({
+                color: 0xFFFFFF,
+                size: 0.05,
+                transparent: true
+            });
+
+            particleSystem = new THREE.Points(particles, pMaterial);
+            scene.add(particleSystem);
+            particleSystem.visible = false;
+
+            camera.position.z = 10;
+            animateAlien();
+            setInterval(blinkEyes, 3000);  // Blink eyes every 3 seconds
+
+            window.addEventListener('click', disperseAlien);
+        }
+
+        function createTentacleWithClaws() {
+            const tentacleMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
+            const tentacle = new THREE.Object3D();
+
+            let segmentLength = 0.5; // smaller segments
+            let numSegments = 5;
+            let currentY = 0;
+            for (let i = 0; i < numSegments; i++) {
+                const segmentGeometry = new THREE.CylinderGeometry(0.05, 0.025, segmentLength, 16);
+                const segment = new THREE.Mesh(segmentGeometry, tentacleMaterial);
+                segment.position.y = currentY - segmentLength / 2;
+                tentacle.add(segment);
+                currentY -= segmentLength;
+            }
+
+            // Adding claws at the end of each tentacle
+            const clawMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+            const clawGeometry = new THREE.ConeGeometry(0.1, 0.2, 8);
+            const claw = new THREE.Mesh(clawGeometry, clawMaterial);
+            claw.position.y = currentY - 0.2;
+            tentacle.add(claw);
+
+            return tentacle;
+        }
+
+        function animateAlien() {
+            requestAnimationFrame(animateAlien);
+            deltaTime = clock.getDelta();
+
+            if (!alienDispersed) {
+                alienHead.rotation.x += 0.005;
+                alienHead.rotation.y += 0.005;
+
+                // Move the alien from bottom-left to top-right
+                alienHead.position.x += 0.5 * deltaTime;
+                alienHead.position.y += 0.5 * deltaTime;
+
+                if (alienHead.position.x > 5) {
+                    alienHead.position.x = -5;
+                    alienHead.position.y = -5;
+                }
+            } else {
+                const positions = particleSystem.geometry.attributes.position.array;
+                const lifetimes = particleSystem.geometry.attributes.lifetime.array;
+
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] += (Math.random() - 0.5) * 0.1;
+                    positions[i * 3 + 1] += (Math.random() - 0.5) * 0.1;
+                    positions[i * 3 + 2] += (Math.random() - 0.5) * 0.1;
+
+                    lifetimes[i] -= deltaTime;
+                    if (lifetimes[i] < 0) {
+                        lifetimes[i] = 0;
+                    }
+                }
+
+                particleSystem.material.opacity = Math.max(0, particleSystem.material.opacity - (1 / (dispersalTime / deltaTime)));
+
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+                particleSystem.geometry.attributes.lifetime.needsUpdate = true;
+
+                if (particleSystem.material.opacity <= 0) {
+                    scene.remove(particleSystem);
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function blinkEyes() {
+            if (!alienDispersed) {
+                eyes.forEach((eye, index) => {
+                    eye.material.color.setHex(eye.material.color.getHex() === 0x000000 ? eyeColors[index] : 0x000000);
+                });
+            }
+        }
+
+        function disperseAlien() {
+            if (!alienDispersed) {
+                alienDispersed = true;
+                alienHead.visible = false;
+                particleSystem.visible = true;
+
+                const positions = particleSystem.geometry.attributes.position.array;
+                const lifetimes = particleSystem.geometry.attributes.lifetime.array;
+
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = alienHead.position.x;
+                    positions[i * 3 + 1] = alienHead.position.y;
+                    positions[i * 3 + 2] = alienHead.position.z;
+                    lifetimes[i] = dispersalTime;
+                }
+
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+                particleSystem.geometry.attributes.lifetime.needsUpdate = true;
+                particleSystem.material.opacity = 1;
+            }
+        }
+
+        initAlien();
+
     </script>
 </body>
 
 </html>
-
-</body>
-
-</html>
-
